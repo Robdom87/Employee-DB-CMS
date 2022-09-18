@@ -4,8 +4,7 @@ FROM department
 
 -- viewRoles
 --show id, title, salary, department
-SELECT department.department_name AS department, 
-role.title, role.id, role.salary
+SELECT role.id, role.title, department.name AS department, role.salary
 FROM role 
 RIGHT JOIN department
 ON department.id = role.department_id

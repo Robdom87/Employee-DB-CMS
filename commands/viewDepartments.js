@@ -1,4 +1,3 @@
-// import cTable from 'console.table';
 import db from '../dbConnect.js';
 
 let viewDPromise = (sql) => {
@@ -25,8 +24,8 @@ async function sequentialQueries(sql) {
 const departmentObj = {
     viewDept: function () {
         const sql = `SELECT id, name AS department FROM department`;
-        let result = sequentialQueries(sql);
-        return result;
+        return sequentialQueries(sql);
+    
     }
 };
 

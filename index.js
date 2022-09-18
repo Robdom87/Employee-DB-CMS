@@ -1,7 +1,7 @@
 import inquirer from 'inquirer';
 import cTable from 'console.table';
 import departmentObj from './commands/viewDepartments.js';
-// import viewRoles from './commands/viewRoles.js';
+import rolesObj from './commands/viewRoles.js';
 // import viewEmployees from './commands/viewEmployees.js';
 // import addRole from './commands/addRole.js';
 // import addDept from './commands/addDepartment.js';
@@ -33,8 +33,7 @@ function commandNavigation(command) {
         case 'view all departments':
             return departmentObj.viewDept();
         case 'view all roles':
-            viewRoles;
-            break;
+            return rolesObj.viewRoles();
         case 'view all employees':
             viewEmployees;
             break;
@@ -50,8 +49,7 @@ function commandNavigation(command) {
         case 'update an employee role':
             updateRole();
             break;
-        case 'quit':
-            console.log('Till next time!');
+        default:
             return;
     }
 };
@@ -60,13 +58,19 @@ function commandNavigation(command) {
 function navigateUser() {
     commandPrompt()
         .then((response) => {
-            let data = commandNavigation(response.command);
-            return data;
-        }).then((data) => {
-            const table = cTable.getTable(data);
-            console.log('\n');
-            console.table(table);
-            navigateUser();
+            return commandNavigation(response.command);
+        })
+        .then((data) => {
+            if (!data) {
+                console.log("Press CTRL + C to exit out of the program.");
+            } else {
+                console.log('\n');
+                //format returned array to print out into table
+                const table = cTable.getTable(data);
+                console.table(table);
+                navigateUser();
+            }
+            return;
         })
 };
 
