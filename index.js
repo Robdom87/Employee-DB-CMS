@@ -1,14 +1,15 @@
-const inquirer = require('inquirer');
-const viewDept = require('./commands/viewDepartments.js');
-const viewRoles = require('./commands/viewRoles');
-const viewEmployees = require('./commands/viewEmployees');
-const addRole = require('./commands/addRole');
-const addDept = require('./commands/addDepartment');
-const addEmployee = require('./commands/addEmployee');
-const updateRole = require('./commands/updateEmpRole');
+import inquirer from 'inquirer';
+import departmentObj from './commands/viewDepartments.js';
+// import viewRoles from './commands/viewRoles.js';
+// import viewEmployees from './commands/viewEmployees.js';
+// import addRole from './commands/addRole.js';
+// import addDept from './commands/addDepartment.js';
+// import addEmployee from './commands/addEmployee.js';
+// import updateRole from './commands/updateEmpRole.js';
 
 //variable to ask navigating question
 const commandPrompt = () => {
+    console.log('command prompt called.')
     return inquirer.prompt([
         {
             type: 'list',
@@ -25,7 +26,7 @@ const commandPrompt = () => {
                     'quit'],
         }
     ]);
-};
+}
 
 //function to ask user for command and do request accordingly
 function navigateUser() {
@@ -33,31 +34,38 @@ function navigateUser() {
         .then((response) => {
             switch (response.command) {
                 case 'view all departments':
-                    viewDept();
+                    departmentObj.viewDept();
+                    break;
                 case 'view all roles':
-                    viewRoles();
+                    viewRoles;
+                    break;
                 case 'view all employees':
-                    viewEmployees();
+                    viewEmployees;
+                    break;
                 case 'add a department':
-                    addDept();
+                    addDept;
+                    break;
                 case 'add a role':
-                    addRole();
+                    addRole;
+                    break;
                 case 'add an employee':
                     addEmployee();
+                    break;
                 case 'update an employee role':
                     updateRole();
+                    break;
                 case 'quit':
                     console.log('Till next time!');
                     return;
             }
             navigateUser();
         });
-};
+}
 
 function start() {
     console.log("\nWelcome to Employee Tracker!\n");
     navigateUser();
     return;
-};
+}
 
 start();
