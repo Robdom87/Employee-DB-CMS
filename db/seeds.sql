@@ -17,11 +17,11 @@ INSERT INTO role(title, salary, department_id) VALUES
 INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES
 ("John", "Doe", 1, 3),           
 ("Jane", "Doe", 1, 3),           
-("Jojo", "Doe", 2, NULL),        
+("Jojo", "Doe", 2, null),        
 ("Brian", "Mann", 3, 6),         
 ("Boris", "Han",3,6),
-("Brie", 'Sui', 4, NULL),          
-("George", "Table", 5,NULL),       
-("Georgina", "Chair", 6 ,NULL),     
-("Chloe", "Carniverious", 7 ,NULL), 
-("Carlos", "Can", 7,NULL);         
+("Brie", 'Sui', 4, null),          
+("George", "Table", 5,null),       
+("Georgina", "Chair", 6 ,null),     
+("Chloe", "Carniverious", 7 ,null), 
+("Carlos", "Can", 7,null);         

@@ -2,7 +2,7 @@ import inquirer from 'inquirer';
 import cTable from 'console.table';
 import departmentObj from './commands/viewDepartments.js';
 import rolesObj from './commands/viewRoles.js';
-// import viewEmployees from './commands/viewEmployees.js';
+import employeesObj from './commands/viewEmployees.js';
 // import addRole from './commands/addRole.js';
 // import addDept from './commands/addDepartment.js';
 // import addEmployee from './commands/addEmployee.js';
@@ -35,8 +35,7 @@ function commandNavigation(command) {
         case 'view all roles':
             return rolesObj.viewRoles();
         case 'view all employees':
-            viewEmployees;
-            break;
+            return employeesObj.viewEmployees();
         case 'add a department':
             addDept;
             break;

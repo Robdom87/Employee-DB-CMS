@@ -12,16 +12,18 @@ ORDER BY role.id;
 
 -- viewEmployees
 --id, first, last, title, dept, salary, manager
-SELECT department.department_name AS department, 
+SELECT employee.id, employee.first_name, employee.last_name, 
 role.title AS title,
 role.salary AS salary,
-employee.id, employee.first_name,employee.last_name,
-employee.manager_id
+department.name AS department, 
+CONCAT(management.first_name,' ',management.last_name) as manager 
 FROM employee
-LEFT JOIN department
-ON department.id = role.department_id
-RIGHT JOIN role
+JOIN role
 ON employee.role_id = role.id
+JOIN department
+ON department.id = role.department_id
+LEFT JOIN employee management
+ON employee.manager_id = management.id
 ORDER BY employee.id;
 
 -- addDepartment
