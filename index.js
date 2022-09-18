@@ -1,4 +1,5 @@
 import inquirer from 'inquirer';
+import cTable from 'console.table';
 import departmentObj from './commands/viewDepartments.js';
 // import viewRoles from './commands/viewRoles.js';
 // import viewEmployees from './commands/viewEmployees.js';
@@ -9,7 +10,6 @@ import departmentObj from './commands/viewDepartments.js';
 
 //variable to ask navigating question
 const commandPrompt = () => {
-    console.log('command prompt called.')
     return inquirer.prompt([
         {
             type: 'list',
@@ -28,39 +28,48 @@ const commandPrompt = () => {
     ]);
 }
 
+function commandNavigation(command) {
+    switch (command) {
+        case 'view all departments':
+            return departmentObj.viewDept();
+        case 'view all roles':
+            viewRoles;
+            break;
+        case 'view all employees':
+            viewEmployees;
+            break;
+        case 'add a department':
+            addDept;
+            break;
+        case 'add a role':
+            addRole;
+            break;
+        case 'add an employee':
+            addEmployee();
+            break;
+        case 'update an employee role':
+            updateRole();
+            break;
+        case 'quit':
+            console.log('Till next time!');
+            return;
+    }
+};
+
 //function to ask user for command and do request accordingly
 function navigateUser() {
     commandPrompt()
         .then((response) => {
-            switch (response.command) {
-                case 'view all departments':
-                    departmentObj.viewDept();
-                    break;
-                case 'view all roles':
-                    viewRoles;
-                    break;
-                case 'view all employees':
-                    viewEmployees;
-                    break;
-                case 'add a department':
-                    addDept;
-                    break;
-                case 'add a role':
-                    addRole;
-                    break;
-                case 'add an employee':
-                    addEmployee();
-                    break;
-                case 'update an employee role':
-                    updateRole();
-                    break;
-                case 'quit':
-                    console.log('Till next time!');
-                    return;
-            }
+            let data = commandNavigation(response.command);
+            return data;
+        }).then((data) => {
+            const table = cTable.getTable(data);
+            console.log('\n');
+            console.table(table);
             navigateUser();
-        });
-}
+        })
+};
+
 
 function start() {
     console.log("\nWelcome to Employee Tracker!\n");
