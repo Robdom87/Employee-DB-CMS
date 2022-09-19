@@ -1,12 +1,8 @@
 import inquirer from 'inquirer';
 import cTable from 'console.table';
-import departmentObj from './commands/viewDepartments.js';
-import rolesObj from './commands/viewRoles.js';
-import employeesObj from './commands/viewEmployees.js';
-// import addRole from './commands/addRole.js';
-// import addDept from './commands/addDepartment.js';
-// import addEmployee from './commands/addEmployee.js';
-// import updateRole from './commands/updateEmpRole.js';
+import departmentObj from './commands/departments.js';
+import rolesObj from './commands/roles.js';
+import employeesObj from './commands/employees.js';
 
 //variable to ask navigating question
 const commandPrompt = () => {
@@ -37,11 +33,9 @@ function commandNavigation(command) {
         case 'view all employees':
             return employeesObj.viewEmployees();
         case 'add a department':
-            addDept;
-            break;
+            return departmentObj.addDept();
         case 'add a role':
-            addRole;
-            break;
+            return rolesObj.addRoles();
         case 'add an employee':
             addEmployee();
             break;
@@ -63,6 +57,7 @@ function navigateUser() {
             if (!data) {
                 console.log("Press CTRL + C to exit out of the program.");
             } else {
+                console.log(data);
                 console.log('\n');
                 //format returned array to print out into table
                 const table = cTable.getTable(data);

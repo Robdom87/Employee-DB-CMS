@@ -41,4 +41,7 @@ const employeesObj = {
     }
 };
 
+
+//similar to role but add list of all employees for manager Q, and add list of all role names questionaire
+
 export default employeesObj;

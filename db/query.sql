@@ -32,7 +32,7 @@ INSERT INTO department (department_name)
 
 -- addRole
 -- ask for role, salary, and which department(list)
-INSERT INTO role (role_title, role_salary, role_department_id)
+INSERT INTO role (role.title, role.salary, role.department_id)
     VALUES (?,?,?)
 
 -- addEmployee
