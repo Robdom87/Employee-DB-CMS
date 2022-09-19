@@ -37,7 +37,7 @@ INSERT INTO role (role.title, role.salary, role.department_id)
 
 -- addEmployee
 -- ask first, last, role(list),manager(list)
-INSERT INTO employee (employee_first, employee_last, employee_role_id, employee_manager_id)
+INSERT INTO employee (employee.first_name, employee.last_name, employee.role_id, employee.manager_id)
     VALUES (?,?,?,?)
 
 -- updateEmpRole

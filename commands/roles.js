@@ -35,7 +35,7 @@ let addRPromise = (sql, params) => {
     });
 };
 
-async function sequentialQueriesAdd(sql, params) {
+async function sequentialQueriesAdd(sql) {
     try {
         const deptList = await departmentObj.viewDept();
         const params = await askRole(deptList);

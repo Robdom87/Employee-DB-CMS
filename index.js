@@ -37,8 +37,7 @@ function commandNavigation(command) {
         case 'add a role':
             return rolesObj.addRoles();
         case 'add an employee':
-            addEmployee();
-            break;
+            return employeesObj.addEmployees();
         case 'update an employee role':
             updateRole();
             break;
