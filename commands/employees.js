@@ -1,46 +1,14 @@
-import db from '../dbConnect.js';
 import inquirer from 'inquirer';
 import roleObj from './roles.js';
+import pHelper  from '../helpers/promise.js'
 
-let viewEPromise = (sql) => {
-    return new Promise((resolve, reject) => {
-        db.query(sql, (error, result) => {
-            if (error) {
-                console.log('ERROR: Not able to find the requested information.');
-                return reject(error);
-            }
-            return resolve(result);
-        });
-    });
-};
-
-async function sequentialQueries(sql) {
-    try {
-        const rows = await viewEPromise(sql);  
-        return rows;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-let addEPromise = (sql, params) => {
-    return new Promise((resolve, reject) => {
-        db.query(sql, params, (error, result) => {
-            if (error) {
-                console.log('ERROR: Not able to find the requested information.');
-                return reject(error);
-            }
-            return resolve(result);
-        });
-    });
-};
-
+//async function to pull role and employee information for params and add employee to db after
 async function sequentialQueriesAdd(sql) {
     try {
         const roleList = await roleObj.viewRoles();
         const employeeList = await employeesObj.viewEmployees();
         const params = await askEmployee(roleList, employeeList);
-        const rows = await addEPromise(sql, params); 
+        const rows = await pHelper.promise(sql, params); 
         //give message for when message it is added 
         return [{'employee': 'added'}];
     } catch (error) {
@@ -48,7 +16,9 @@ async function sequentialQueriesAdd(sql) {
     }
 }
 
+//function to ask user for relevant employee info
 const askEmployee = async (roleList, employeeList) => {
+    //push all role names and employee names to lists to be presented in the questionaire
     let rlist = [];
     for (let i = 0; i < roleList.length; i++) {
         rlist.push(roleList[i].title);
@@ -58,6 +28,7 @@ const askEmployee = async (roleList, employeeList) => {
         let fullName = employeeList[i].first_name+' '+employeeList[i].last_name;
         elist.push(fullName);
     }
+    //push none option for manager question
     elist.push('none');
     const response = await inquirer.prompt([
         {
@@ -83,7 +54,8 @@ const askEmployee = async (roleList, employeeList) => {
             choices: elist
         }
     ]);
-    
+    //find role id and manager id for the role and managers selected
+    //update the response properties accordingly
     for (let i = 0; i < roleList.length; i++) {
         if(roleList[i].title === response.role_id){
             response.role_id = roleList[i].id;
@@ -95,11 +67,13 @@ const askEmployee = async (roleList, employeeList) => {
         if(fullName === response.manager_id){
             response.manager_id = employeeList[i].id;
             break;
+        //add null to property if none is selected
         } else if (response.manager_id === 'none') {
             response.manager_id = null;
             break;
         }
     }
+    //push all object properties into an array to pass required params syntax
     let respList = [];
     respList.push(response.first_name);
     respList.push(response.last_name);
@@ -107,7 +81,6 @@ const askEmployee = async (roleList, employeeList) => {
     respList.push(response.manager_id);
     return respList;     
 }
-
 
 const employeesObj = {
     viewEmployees: function () {
@@ -125,15 +98,12 @@ const employeesObj = {
         LEFT JOIN employee management
         ON employee.manager_id = management.id
         ORDER BY employee.id`;
-        return sequentialQueries(sql);
+        return pHelper.viewSeqQuery(sql);
     },
     addEmployees: function() {
         const sql = `INSERT INTO employee (employee.first_name, employee.last_name, employee.role_id, employee.manager_id) VALUES (?,?,?,?)`;
             return sequentialQueriesAdd(sql);
         }    
 };
-
-
-//similar to role but add list of all employees for manager Q, and add list of all role names questionaire
 
 export default employeesObj;

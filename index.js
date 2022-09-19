@@ -24,6 +24,7 @@ const commandPrompt = () => {
     ]);
 }
 
+//direct the user to the correct function depending on their response
 function commandNavigation(command) {
     switch (command) {
         case 'view all departments':
@@ -53,9 +54,9 @@ function navigateUser() {
         })
         .then((data) => {
             if (!data) {
+                //response for quit option
                 console.log("Press CTRL + C to exit out of the program.");
             } else {
-                console.log(data);
                 console.log('\n');
                 //format returned array to print out into table
                 const table = cTable.getTable(data);

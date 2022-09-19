@@ -1,46 +1,14 @@
-import db from '../dbConnect.js';
 import inquirer from 'inquirer';
 import departmentObj from './departments.js';
 import employeesObj from './employees.js';
+import pHelper  from '../helpers/promise.js'
 
-let viewRPromise = (sql) => {
-    return new Promise((resolve, reject) => {
-        db.query(sql, (error, result) => {
-            if (error) {
-                console.log('ERROR: Not able to find the requested information.');
-                return reject(error);
-            }
-            return resolve(result);
-        });
-    });
-};
-
-async function sequentialQueries(sql) {
-    try {
-        const rows = await viewRPromise(sql);
-        return rows;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-let addRPromise = (sql, params) => {
-    return new Promise((resolve, reject) => {
-        db.query(sql, params, (error, result) => {
-            if (error) {
-                console.log('ERROR: Not able to find the requested information.');
-                return reject(error);
-            }
-            return resolve(result);
-        });
-    });
-};
-
+//async function to pull department information for params and add role to db
 async function sequentialQueriesAdd(sql) {
     try {
         const deptList = await departmentObj.viewDept();
         const params = await askRole(deptList);
-        const rows = await addRPromise(sql, params);
+        const rows = await pHelper.promise(sql, params);
         //give message for when message it is added 
         return [{ 'role': 'added' }];
     } catch (error) {
@@ -48,8 +16,9 @@ async function sequentialQueriesAdd(sql) {
     }
 }
 
+//function to ask user for relevant role info
 const askRole = async (deptList) => {
-    console.log(deptList);
+    //push all department names into list to be presented in questions
     let list = [];
     for (let i = 0; i < deptList.length; i++) {
         list.push(deptList[i].department);
@@ -72,13 +41,14 @@ const askRole = async (deptList) => {
             choices: list
         }
     ]);
-
+    //find department id for selected department, and update response id
     for (let i = 0; i < deptList.length; i++) {
         if (deptList[i].department === response.department_id) {
             response.department_id = deptList[i].id;
             break;
         }
     }
+    //push all object properties into an array to pass required params syntax
     let respList = [];
     respList.push(response.title);
     respList.push(response.salary);
@@ -86,24 +56,13 @@ const askRole = async (deptList) => {
     return respList;
 }
 
-let updateRPromise = (sql, params) => {
-    return new Promise((resolve, reject) => {
-        db.query(sql, params, (error, result) => {
-            if (error) {
-                console.log('ERROR: Not able to find the requested information.');
-                return reject(error);
-            }
-            return resolve(result);
-        });
-    });
-};
-
+//async function to pull role and employee information for params and update employee role after
 async function sequentialQueriesUpdate(sql) {
     try {
         const roleList = await rolesObj.viewRoles();
         const employeeList = await employeesObj.viewEmployees();
         const params = await updateRoleQ(roleList, employeeList);
-        const rows = await updateRPromise(sql, params);
+        const rows = await pHelper.promise(sql, params);
         //give message for when message it is added 
         return [{ 'role': 'updated' }];
     } catch (error) {
@@ -112,6 +71,7 @@ async function sequentialQueriesUpdate(sql) {
 }
 
 const updateRoleQ = async (roleList, employeeList) => {
+    //push all role names and employee names to lists to be presented in the questionaire
     let rlist = [];
     for (let i = 0; i < roleList.length; i++) {
         rlist.push(roleList[i].title);
@@ -136,6 +96,8 @@ const updateRoleQ = async (roleList, employeeList) => {
         }
         
     ]);
+    //find role id and manager id for the role and managers selected
+    //update the response properties accordingly
     for (let i = 0; i < roleList.length; i++) {
         if(roleList[i].title === response.role_id){
             response.role_id = roleList[i].id;
@@ -149,6 +111,7 @@ const updateRoleQ = async (roleList, employeeList) => {
             break;
         }
     }
+    //push all object properties into an array to pass required params syntax
     let respList = [];
     respList.push(response.role_id);
     respList.push(response.employee_id);
@@ -163,7 +126,7 @@ const rolesObj = {
         RIGHT JOIN department
         ON department.id = role.department_id
         ORDER BY role.id`;
-        return sequentialQueries(sql);
+        return pHelper.viewSeqQuery(sql);
     },
     addRoles: function () {
         const sql = `INSERT INTO role (role.title, role.salary, role.department_id) VALUES (?,?,?)`;
@@ -175,8 +138,5 @@ const rolesObj = {
     }
 
 };
-
-//similar to role but add list of all employees, and add list of all role names to figure out whose to update
-
 
 export default rolesObj;
