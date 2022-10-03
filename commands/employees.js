@@ -123,6 +123,139 @@ const deleteEmployeeQ = async (employeeList) => {
     return respList;
 }
 
+async function sequentialQueriesUpdateManager(viewSql, sql) {
+    try {
+        const employeeList = await pHelper.viewSeqQuery(viewSql);
+        const params = await updateManagerQ(employeeList);
+        const rows = await pHelper.promise(sql, params);
+        //give message for when message it is added 
+        return [{ 'manager': 'updated' }];
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const updateManagerQ = async (employeeList) => {
+    //push all employee names to lists to be presented in the questionaire
+   
+    let elist = [];
+    for (let i = 0; i < employeeList.length; i++) {
+        let fullName = employeeList[i].first_name + ' ' + employeeList[i].last_name;
+        elist.push(fullName);
+    }
+    let mlist = [];
+    for (let i = 0; i < employeeList.length; i++) {
+        if( employeeList[i].manager !== null && !mlist.includes(employeeList[i].manager)) {
+            mlist.push(employeeList[i].manager);
+        }  
+    }
+    const response = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'employee_id',
+            message: "Select employee to update manager for:",
+            choices: elist
+        },
+        {
+            type: 'list',
+            name: 'manager_id',
+            message: 'Who should their manager be?',
+            choices: mlist
+        }
+
+    ]);
+    //find role id and manager id for the role and managers selected
+    //update the response properties accordingly
+    for (let i = 0; i < employeeList.length; i++) {
+        if (employeeList[i].manager === response.manager_id) {
+            response.manager_id = employeeList[i].manager_id;
+            break;
+        }
+    }
+    for (let i = 0; i < employeeList.length; i++) {
+        let fullName = employeeList[i].first_name + ' ' + employeeList[i].last_name;
+        if (fullName === response.employee_id) {
+            response.employee_id = employeeList[i].id;
+            break;
+        }
+    }
+    //push all object properties into an array to pass required params syntax
+    let respList = [];
+    respList.push(response.manager_id);
+    respList.push(response.employee_id);
+    return respList;
+}
+
+async function sequentialQueriesViewManager(sql) {
+    try {
+        const employeeList = await employeesObj.viewEmployees();
+        const params = await viewManagerQ(employeeList);
+        const rows = await pHelper.promise(sql, params);
+        //give message for when message it is added 
+        return rows;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const viewManagerQ = async (employeeList) => {
+    //push all employee names to lists to be presented in the questionaire
+    let mlist = [];
+    for (let i = 0; i < employeeList.length; i++) {
+        if( employeeList[i].manager !== null && !mlist.includes(employeeList[i].manager)) {
+            mlist.push(employeeList[i].manager);
+        }  
+    }
+    const response = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'manager_id',
+            message: 'Please select a manager:',
+            choices: mlist
+        }
+
+    ]);
+    //push all object properties into an array to pass required params syntax
+    let respList = [];
+    respList.push(response.manager_id);
+    return respList;
+}
+
+async function sequentialQueriesViewDept(sql) {
+    try {
+        const employeeList = await employeesObj.viewEmployees();
+        const params = await viewDeptQ(employeeList);
+        const rows = await pHelper.promise(sql, params);
+        //give message for when message it is added 
+        return rows;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const viewDeptQ = async (employeeList) => {
+    //push all employee names to lists to be presented in the questionaire
+    let dlist = [];
+    for (let i = 0; i < employeeList.length; i++) {
+        if( employeeList[i].department !== null && !dlist.includes(employeeList[i].department)) {
+            dlist.push(employeeList[i].department);
+        }  
+    }
+    const response = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'department_id',
+            message: 'Please select a department:',
+            choices: dlist
+        }
+
+    ]);
+    //push all object properties into an array to pass required params syntax
+    let respList = [];
+    respList.push(response.department_id);
+    return respList;
+}
+
 const employeesObj = {
     viewEmployees: function () {
         const sql =
@@ -145,13 +278,21 @@ const employeesObj = {
         const sql = `INSERT INTO employee (employee.first_name, employee.last_name, employee.role_id, employee.manager_id) VALUES (?,?,?,?)`;
         return sequentialQueriesAdd(sql);
     },
+    //find employee update manager
     updateManager: function () {
-        return;
+        const viewSql = 
+        `SELECT employee.id, employee.first_name, employee.last_name, 
+        employee.manager_id, CONCAT(management.first_name,' ',management.last_name) as manager 
+        FROM employee
+        LEFT JOIN employee management
+        ON employee.manager_id = management.id
+        ORDER BY employee.id`;
+        const sql = `UPDATE employee SET employee.manager_id = ? WHERE id = ?`;
+        return sequentialQueriesUpdateManager(viewSql, sql);
     },
     //view all employees under one manager
-    viewByManagers: function () {
-        const sql =
-        `SELECT employee.id, employee.first_name, employee.last_name, 
+    viewByManager: function () {
+        const sql = `SELECT employee.id, employee.first_name, employee.last_name, 
         role.title AS title,
         role.salary AS salary,
         department.name AS department, 
@@ -163,13 +304,13 @@ const employeesObj = {
         ON department.id = role.department_id
         LEFT JOIN employee management
         ON employee.manager_id = management.id
+        WHERE CONCAT(management.first_name,' ',management.last_name) = ?
         ORDER BY employee.id`;
-        return pHelper.viewSeqQuery(sql);
+        return sequentialQueriesViewManager(sql);
     },
     //view all employees under one department
     viewByDepartment: function () {
-        const sql =
-        `SELECT employee.id, employee.first_name, employee.last_name, 
+        const sql = `SELECT employee.id, employee.first_name, employee.last_name, 
         role.title AS title,
         role.salary AS salary,
         department.name AS department, 
@@ -181,28 +322,16 @@ const employeesObj = {
         ON department.id = role.department_id
         LEFT JOIN employee management
         ON employee.manager_id = management.id
+        WHERE department.name = ?
         ORDER BY employee.id`;
-        return pHelper.viewSeqQuery(sql);
+        return sequentialQueriesViewDept(sql);
     },
     deleteEmployee: function () {
         const sql = 'DELETE FROM employee WHERE id = ?';
         return sequentialQueriesDeleteEmployee(sql);
     },
     viewBudgetDept: function () {
-        const sql =
-        `SELECT employee.id, employee.first_name, employee.last_name, 
-        role.title AS title,
-        role.salary AS salary,
-        department.name AS department, 
-        CONCAT(management.first_name,' ',management.last_name) as manager 
-        FROM employee
-        JOIN role
-        ON employee.role_id = role.id
-        JOIN department
-        ON department.id = role.department_id
-        LEFT JOIN employee management
-        ON employee.manager_id = management.id
-        ORDER BY employee.id`;
+        const sql = '';
         return pHelper.viewSeqQuery(sql);
     }
 };
