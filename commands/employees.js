@@ -85,7 +85,7 @@ const askEmployee = async (roleList, employeeList) => {
 const employeesObj = {
     viewEmployees: function () {
         const sql =
-            `SELECT employee.id, employee.first_name, employee.last_name, 
+        `SELECT employee.id, employee.first_name, employee.last_name, 
         role.title AS title,
         role.salary AS salary,
         department.name AS department, 
@@ -107,17 +107,61 @@ const employeesObj = {
     updateManager: function () {
         return;
     },
+    //view all employees under one manager
     viewByManagers: function () {
-        return;
+        const sql =
+        `SELECT employee.id, employee.first_name, employee.last_name, 
+        role.title AS title,
+        role.salary AS salary,
+        department.name AS department, 
+        CONCAT(management.first_name,' ',management.last_name) as manager 
+        FROM employee
+        JOIN role
+        ON employee.role_id = role.id
+        JOIN department
+        ON department.id = role.department_id
+        LEFT JOIN employee management
+        ON employee.manager_id = management.id
+        ORDER BY employee.id`;
+        return pHelper.viewSeqQuery(sql);
     },
+    //view all employees under one department
     viewByDepartment: function () {
-        return;
+        const sql =
+        `SELECT employee.id, employee.first_name, employee.last_name, 
+        role.title AS title,
+        role.salary AS salary,
+        department.name AS department, 
+        CONCAT(management.first_name,' ',management.last_name) as manager 
+        FROM employee
+        JOIN role
+        ON employee.role_id = role.id
+        JOIN department
+        ON department.id = role.department_id
+        LEFT JOIN employee management
+        ON employee.manager_id = management.id
+        ORDER BY employee.id`;
+        return pHelper.viewSeqQuery(sql);
     },
     deleteEmployee: function () {
         return;
     },
     viewBudgetDept: function () {
-        return;
+        const sql =
+        `SELECT employee.id, employee.first_name, employee.last_name, 
+        role.title AS title,
+        role.salary AS salary,
+        department.name AS department, 
+        CONCAT(management.first_name,' ',management.last_name) as manager 
+        FROM employee
+        JOIN role
+        ON employee.role_id = role.id
+        JOIN department
+        ON department.id = role.department_id
+        LEFT JOIN employee management
+        ON employee.manager_id = management.id
+        ORDER BY employee.id`;
+        return pHelper.viewSeqQuery(sql);
     }
 };
 
