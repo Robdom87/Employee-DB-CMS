@@ -256,6 +256,18 @@ const viewDeptQ = async (employeeList) => {
     return respList;
 }
 
+async function sequentialQueriesViewDeptBudget(sql) {
+    try {
+        const employeeList = await employeesObj.viewEmployees();
+        const params = await viewDeptQ(employeeList);
+        const rows = await pHelper.promise(sql, params);
+        //give message for when message it is added 
+        return rows;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 const employeesObj = {
     viewEmployees: function () {
         const sql =
@@ -331,8 +343,15 @@ const employeesObj = {
         return sequentialQueriesDeleteEmployee(sql);
     },
     viewBudgetDept: function () {
-        const sql = '';
-        return pHelper.viewSeqQuery(sql);
+        const sql = 
+        `SELECT department.name AS department, SUM(role.salary) AS budget  
+        FROM role
+        JOIN department
+        ON department.id = role.department_id
+        JOIN employee
+        ON employee.role_id = role.id
+        WHERE department.name = ?`;
+        return sequentialQueriesViewDeptBudget(sql);
     }
 };
 
