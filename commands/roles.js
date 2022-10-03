@@ -74,8 +74,11 @@ const updateRoleQ = async (roleList, employeeList) => {
     //push all role names and employee names to lists to be presented in the questionaire
     let rlist = [];
     for (let i = 0; i < roleList.length; i++) {
-        rlist.push(roleList[i].title);
+        if (roleList[i].title !== null){
+            rlist.push(roleList[i].title);
+        }
     }
+    console.log(rlist);
     let elist = [];
     for (let i = 0; i < employeeList.length; i++) {
         let fullName = employeeList[i].first_name + ' ' + employeeList[i].last_name;
@@ -118,6 +121,49 @@ const updateRoleQ = async (roleList, employeeList) => {
     return respList;
 }
 
+async function sequentialQueriesDeleteRole(sql) {
+    try {
+        const roleList = await rolesObj.viewRoles();
+        const params = await deleteRoleQ(roleList);
+        const rows = await pHelper.promise(sql, params);
+        //give message for when message it is added 
+        return [{ 'role': 'deleted' }];
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const deleteRoleQ = async (roleList) => {
+    //push all role names to a list to be presented in the questionaire
+    let rlist = [];
+    for (let i = 0; i < roleList.length; i++) {
+        if (roleList[i].title !== null){
+            rlist.push(roleList[i].title);
+        }
+    }
+    const response = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'role_id',
+            message: 'What role should be deleted?',
+            choices: rlist
+        }
+
+    ]);
+    //find role id for the role selected
+    //update the response properties accordingly
+    for (let i = 0; i < roleList.length; i++) {
+        if (roleList[i].title === response.role_id) {
+            response.role_id = roleList[i].id;
+            break;
+        }
+    }
+    //push all object properties into an array to pass required params syntax
+    let respList = [];
+    respList.push(response.role_id);
+    return respList;
+}
+
 const rolesObj = {
     viewRoles: function () {
         const sql =
@@ -137,7 +183,8 @@ const rolesObj = {
         return sequentialQueriesUpdate(sql);
     },
     deleteRole: function () {
-        return;
+        const sql = 'DELETE FROM role WHERE id= ?';
+        return sequentialQueriesDeleteRole(sql);
     }
 
 };

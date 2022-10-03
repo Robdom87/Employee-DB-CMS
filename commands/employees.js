@@ -82,6 +82,47 @@ const askEmployee = async (roleList, employeeList) => {
     return respList;
 }
 
+async function sequentialQueriesDeleteEmployee(sql) {
+    try {
+        const employeeList = await employeesObj.viewEmployees();
+        const params = await deleteEmployeeQ(employeeList);
+        const rows = await pHelper.promise(sql, params);
+        //give message for when message it is added 
+        return [{ 'employee': 'deleted' }];
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const deleteEmployeeQ = async (employeeList) => {
+    //push all employee names to a list to be presented in the questionaire
+    let elist = [];
+    for (let i = 0; i < employeeList.length; i++) {
+        let fullName = employeeList[i].first_name + ' ' + employeeList[i].last_name;
+        elist.push(fullName);
+    }
+    const response = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'employee_id',
+            message: 'What employee should be deleted?',
+            choices: elist
+        }
+
+    ]);
+    for (let i = 0; i < employeeList.length; i++) {
+        let fullName = employeeList[i].first_name + ' ' + employeeList[i].last_name;
+        if (fullName === response.employee_id) {
+            response.employee_id = employeeList[i].id;
+            break;
+        }
+    }
+    //push all object properties into an array to pass required params syntax
+    let respList = [];
+    respList.push(response.employee_id);
+    return respList;
+}
+
 const employeesObj = {
     viewEmployees: function () {
         const sql =
@@ -144,7 +185,8 @@ const employeesObj = {
         return pHelper.viewSeqQuery(sql);
     },
     deleteEmployee: function () {
-        return;
+        const sql = 'DELETE FROM employee WHERE id = ?';
+        return sequentialQueriesDeleteEmployee(sql);
     },
     viewBudgetDept: function () {
         const sql =
