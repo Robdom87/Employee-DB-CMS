@@ -12,13 +12,21 @@ const commandPrompt = () => {
             name: 'command',
             message: 'What would you like to do?',
             choices:
-                ['view all departments',
+                [
+                    'view all departments',
                     'view all roles',
                     'view all employees',
+                    'view employees by manager',
+                    'view employees by department',
+                    'view total utilized budget of a department',
                     'add a department',
                     'add a role',
                     'add an employee',
                     'update an employee role',
+                    'update employee manager',
+                    'delete department',
+                    'delete role',
+                    'delete employee',
                     'quit'],
         }
     ]);
@@ -41,8 +49,22 @@ function commandNavigation(command) {
             return employeesObj.addEmployees();
         case 'update an employee role':
             return rolesObj.updateRole();
+        case 'update employee manager':
+            return employeesObj.updateManager();
+        case  'view employees by manager':
+            return employeesObj.viewByManager();
+        case 'view employees by department':
+            return employeesObj.viewByDepartment();
+        case 'delete department':
+            return departmentObj.deleteDept();
+        case 'delete role':
+            return rolesObj.deleteRole();
+        case 'delete employee':
+            return employeesObj.deleteEmployee();
+        case 'view total utilized budget of a department':
+            return employeesObj.viewBudgetDept();
         default:
-            return;
+            return;            
     }
 };
 

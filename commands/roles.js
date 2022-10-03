@@ -1,7 +1,7 @@
 import inquirer from 'inquirer';
 import departmentObj from './departments.js';
 import employeesObj from './employees.js';
-import pHelper  from '../helpers/promise.js'
+import pHelper from '../helpers/promise.js'
 
 //async function to pull department information for params and add role to db
 async function sequentialQueriesAdd(sql) {
@@ -78,7 +78,7 @@ const updateRoleQ = async (roleList, employeeList) => {
     }
     let elist = [];
     for (let i = 0; i < employeeList.length; i++) {
-        let fullName = employeeList[i].first_name+' '+employeeList[i].last_name;
+        let fullName = employeeList[i].first_name + ' ' + employeeList[i].last_name;
         elist.push(fullName);
     }
     const response = await inquirer.prompt([
@@ -94,19 +94,19 @@ const updateRoleQ = async (roleList, employeeList) => {
             message: 'What should their role be?',
             choices: rlist
         }
-        
+
     ]);
     //find role id and manager id for the role and managers selected
     //update the response properties accordingly
     for (let i = 0; i < roleList.length; i++) {
-        if(roleList[i].title === response.role_id){
+        if (roleList[i].title === response.role_id) {
             response.role_id = roleList[i].id;
             break;
         }
     }
     for (let i = 0; i < employeeList.length; i++) {
-        let fullName = employeeList[i].first_name+' '+employeeList[i].last_name;
-        if(fullName === response.employee_id){
+        let fullName = employeeList[i].first_name + ' ' + employeeList[i].last_name;
+        if (fullName === response.employee_id) {
             response.employee_id = employeeList[i].id;
             break;
         }
@@ -135,6 +135,9 @@ const rolesObj = {
     updateRole: function () {
         const sql = `UPDATE employee SET employee.role_id = ? WHERE id = ?`;
         return sequentialQueriesUpdate(sql);
+    },
+    deleteRole: function () {
+        return;
     }
 
 };

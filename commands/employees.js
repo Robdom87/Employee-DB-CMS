@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
 import roleObj from './roles.js';
-import pHelper  from '../helpers/promise.js'
+import pHelper from '../helpers/promise.js'
 
 //async function to pull role and employee information for params and add employee to db after
 async function sequentialQueriesAdd(sql) {
@@ -8,9 +8,9 @@ async function sequentialQueriesAdd(sql) {
         const roleList = await roleObj.viewRoles();
         const employeeList = await employeesObj.viewEmployees();
         const params = await askEmployee(roleList, employeeList);
-        const rows = await pHelper.promise(sql, params); 
+        const rows = await pHelper.promise(sql, params);
         //give message for when message it is added 
-        return [{'employee': 'added'}];
+        return [{ 'employee': 'added' }];
     } catch (error) {
         console.log(error);
     }
@@ -25,7 +25,7 @@ const askEmployee = async (roleList, employeeList) => {
     }
     let elist = [];
     for (let i = 0; i < employeeList.length; i++) {
-        let fullName = employeeList[i].first_name+' '+employeeList[i].last_name;
+        let fullName = employeeList[i].first_name + ' ' + employeeList[i].last_name;
         elist.push(fullName);
     }
     //push none option for manager question
@@ -57,17 +57,17 @@ const askEmployee = async (roleList, employeeList) => {
     //find role id and manager id for the role and managers selected
     //update the response properties accordingly
     for (let i = 0; i < roleList.length; i++) {
-        if(roleList[i].title === response.role_id){
+        if (roleList[i].title === response.role_id) {
             response.role_id = roleList[i].id;
             break;
         }
     }
     for (let i = 0; i < employeeList.length; i++) {
-        let fullName = employeeList[i].first_name+' '+employeeList[i].last_name;
-        if(fullName === response.manager_id){
+        let fullName = employeeList[i].first_name + ' ' + employeeList[i].last_name;
+        if (fullName === response.manager_id) {
             response.manager_id = employeeList[i].id;
             break;
-        //add null to property if none is selected
+            //add null to property if none is selected
         } else if (response.manager_id === 'none') {
             response.manager_id = null;
             break;
@@ -79,13 +79,13 @@ const askEmployee = async (roleList, employeeList) => {
     respList.push(response.last_name);
     respList.push(response.role_id);
     respList.push(response.manager_id);
-    return respList;     
+    return respList;
 }
 
 const employeesObj = {
     viewEmployees: function () {
-        const sql = 
-        `SELECT employee.id, employee.first_name, employee.last_name, 
+        const sql =
+            `SELECT employee.id, employee.first_name, employee.last_name, 
         role.title AS title,
         role.salary AS salary,
         department.name AS department, 
@@ -100,10 +100,25 @@ const employeesObj = {
         ORDER BY employee.id`;
         return pHelper.viewSeqQuery(sql);
     },
-    addEmployees: function() {
+    addEmployees: function () {
         const sql = `INSERT INTO employee (employee.first_name, employee.last_name, employee.role_id, employee.manager_id) VALUES (?,?,?,?)`;
-            return sequentialQueriesAdd(sql);
-        }    
+        return sequentialQueriesAdd(sql);
+    },
+    updateManager: function () {
+        return;
+    },
+    viewByManagers: function () {
+        return;
+    },
+    viewByDepartment: function () {
+        return;
+    },
+    deleteEmployee: function () {
+        return;
+    },
+    viewBudgetDept: function () {
+        return;
+    }
 };
 
 export default employeesObj;
