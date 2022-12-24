@@ -1,4 +1,4 @@
-# employee_db_cms
+# Employee-DB-CMS
 ![badmath](https://img.shields.io/github/languages/top/lernantino/badmath)
 
 ## Description
@@ -36,14 +36,14 @@ The current menu allows the user to
 
 ![Screenshot](./assets/Screenshot.png)
 
-https://drive.google.com/file/d/18zzU397rDHPwQ1yb3TzOdt0M9ndUcAeG/view
+[Walk-Thru Video](https://drive.google.com/file/d/18zzU397rDHPwQ1yb3TzOdt0M9ndUcAeG/view)
 
 
 ## License
 
 MIT License
 
-Copyright (c) [2022] [employee_db_cms]
+Copyright (c) [2022]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
